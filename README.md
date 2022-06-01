@@ -1,7 +1,13 @@
-# Android mDNSResponder [![Circle CI](https://circleci.com/gh/andriydruk/RxDNSSD.svg?style=shield&circle-token=5f0cb1ee907a20bdb08aa4b073b5690afbaaabe1)](https://circleci.com/gh/andriydruk/RxDNSSD) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/dnssd?label=DNSSD)](https://search.maven.org/artifact/com.github.andriydruk/dnssd) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/rxdnssd?label=RxDNSSD)](https://search.maven.org/artifact/com.github.andriydruk/rxdnssd) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/rx2dnssd?label=Rx2DNSSD) ](https://search.maven.org/artifact/com.github.andriydruk/rx2dnssd)
+# 📣 Android mDNSResponder [![Download](https://img.shields.io/maven-central/v/live.ditto/dnssd?label=DNSSD)](https://search.maven.org/artifact/live.ditto/dnssd) [![Download](https://img.shields.io/maven-central/v/live.ditto/rxdnssd?label=RxDNSSD)](https://search.maven.org/artifact/live.ditto/rxdnssd) [![Download](https://img.shields.io/maven-central/v/live.ditto/rx2dnssd?label=Rx2DNSSD)](https://search.maven.org/artifact/live.ditto/rx2dnssd)
 
-## Why I created this library?
-My [explanation](http://andriydruk.com/post/mdnsresponder/) about why jmDNS, Android NSD Services and Google Nearby API are not good enough, and why I maintain this library.
+## 🍴 Ditto Fork of RxDNSSD
+
+Welcome to the [Ditto](https://www.ditto.live/) fork of RxDNSSD. The original [RxDNSSD](https://github.com/andriydruk/RxDNSSD) library was created by [Andriy Druk](https://andriydruk.com/). Andriy is unable to continue supporting the library due to the Russia's unprovoked war in Ukraine. We are grateful that Andriy was able to build this amazing library! You can read his [explanation](https://andriydruk.com/post/mdnsresponder/) about why jmDNS, Android NSD Services and Google Nearby API are not good enough, and why he built this library.
+
+We created this fork because the Ditto Android SDK uses this library for mDNS functionality to discover other small peers on the same WiFi LAN. The maven coordinates for releases from this repo are similar, but have a groupId of `live.ditto`.
+
+- `com.github.andriydruk:*dnssd:0.9.14-0.9.17`
+- `live.ditto:*dnssd:1.0.0+`
 
 ## Hierarchy
 
@@ -239,6 +245,7 @@ browseDisposable = rxDnssd.browse("_http._tcp", "local.")
 License
 -------
 	Copyright (C) 2021 Andriy Druk
+	Copyright (C) 2022 DittoLive Incorporated
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
