@@ -56,22 +56,22 @@ Embedded version:
 DNSSD library:
 
 ```groovy
-compile 'live.ditto:dnssd:0.9.15'
+compile 'live.ditto:dnssd:1.0.0'
 ```
 
 RxDNSSD library:
 
 ```groovy
-compile 'live.ditto:rxdnssd:0.9.15'
+compile 'live.ditto:rxdnssd:1.0.0'
 ```
 
 Rx2DNSSD library:
 
 ```groovy
-compile 'live.ditto:rx2dnssd:0.9.15'
+compile 'live.ditto:rx2dnssd:1.0.0'
 ```
 
-* It's built with Android NDK 21 for all platforms (1.7 MB). If you prefer another NDK version or subset of platforms, please build it from source with command:
+* It's built with Android NDK 24 for all platforms (1.7 MB). If you prefer another NDK version or subset of platforms, please build it from source with command:
 
 ```command
 ./gradlew clean build
