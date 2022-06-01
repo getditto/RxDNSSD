@@ -27,7 +27,7 @@ android {
 
 dependencies {
     api project(':dnssd')
-    //api "com.github.andriydruk:dnssd:$mavenCentralVersion"
+    //api "live.ditto:dnssd:$mavenCentralVersion"
 
     // Transitively export that dependencies to other modules
     api 'io.reactivex:rxandroid:1.2.1'
@@ -48,7 +48,7 @@ dependencies {
 }
 
 ext {
-    PUBLISH_GROUP_ID = 'com.github.andriydruk'
+    PUBLISH_GROUP_ID = 'live.ditto'
     PUBLISH_ARTIFACT_ID = 'rxdnssd'
 }
 

@@ -1,15 +1,11 @@
 # Android mDNSResponder [![Circle CI](https://circleci.com/gh/andriydruk/RxDNSSD.svg?style=shield&circle-token=5f0cb1ee907a20bdb08aa4b073b5690afbaaabe1)](https://circleci.com/gh/andriydruk/RxDNSSD) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/dnssd?label=DNSSD)](https://search.maven.org/artifact/com.github.andriydruk/dnssd) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/rxdnssd?label=RxDNSSD)](https://search.maven.org/artifact/com.github.andriydruk/rxdnssd) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/rx2dnssd?label=Rx2DNSSD) ](https://search.maven.org/artifact/com.github.andriydruk/rx2dnssd)
 
-
-
-
-
 ## Why I created this library?
 My [explanation](http://andriydruk.com/post/mdnsresponder/) about why jmDNS, Android NSD Services and Google Nearby API are not good enough, and why I maintain this library.
 
 ## Hierarchy
 
-There are two version of mDNSReposder. 
+There are two versions of mDNSReponder.
 
 Bindable version:
 
@@ -43,7 +39,7 @@ Embedded version:
                                 |   +--------------------+   |
                                  -->| Android Java DNSSD |<--
                                     +--------------------+
-                                    |   Apple Java DNSSD |    
+                                    |   Apple Java DNSSD |
                                     +--------------------+
                                     |    mDNS Client     |
                                     +--------------------+
@@ -60,24 +56,24 @@ Embedded version:
 DNSSD library:
 
 ```groovy
-compile 'com.github.andriydruk:dnssd:0.9.15'
+compile 'live.ditto:dnssd:0.9.15'
 ```
 
 RxDNSSD library:
 
 ```groovy
-compile 'com.github.andriydruk:rxdnssd:0.9.15'
+compile 'live.ditto:rxdnssd:0.9.15'
 ```
 
 Rx2DNSSD library:
 
-```
-compile 'com.github.andriydruk:rx2dnssd:0.9.15'
-```
-
-* It's built with Andorid NDK 21 for all platforms (1.7 MB). If you prefer another NDK version or subset of platforms, please build it from source with command:
-
 ```groovy
+compile 'live.ditto:rx2dnssd:0.9.15'
+```
+
+* It's built with Android NDK 21 for all platforms (1.7 MB). If you prefer another NDK version or subset of platforms, please build it from source with command:
+
+```command
 ./gradlew clean build
 ```
 
@@ -85,28 +81,28 @@ compile 'com.github.andriydruk:rx2dnssd:0.9.15'
 
 ### DNSSD
 
-Dnssd library provides two implementations of DNSSD interface: 
+Dnssd library provides two implementations of DNSSD interface:
 
-DNSSDBindable is an implementation of DNSSD with system's daemon. Use it for Android project with min API higher than 4.1 for an economy of battery consumption (Also some Samsung devices can don't work with this implementation).
+`DNSSDBindable` is an implementation of DNSSD with system's daemon. Use it for Android project with min API higher than 4.1 for an economy of battery consumption (Also some Samsung devices can don't work with this implementation).
 
-```
-DNSSD dnssd = new DNSSDBindable(context); 
+```java
+DNSSD dnssd = new DNSSDBindable(context);
 ```
 
 DNSSDEmbedded is an implementation of RxDnssd with embedded DNS-SD core. Can be used for any Android device with min API higher than Android 4.0.
 
-```
-DNSSD dnssd = new DNSSDEmbedded(); 
+```java
+DNSSD dnssd = new DNSSDEmbedded();
 ```
 
 ##### Register service
 ```java
 try {
-	registerService = dnssd.register("service_name", "_rxdnssd._tcp", 123,  
+	registerService = dnssd.register("service_name", "_rxdnssd._tcp", 123,
    		new RegisterListener() {
 
 			@Override
-			public void serviceRegistered(DNSSDRegistration registration, int flags, 
+			public void serviceRegistered(DNSSDRegistration registration, int flags,
 				String serviceName, String regType, String domain) {
 				Log.i("TAG", "Register successfully ");
 			}
@@ -122,18 +118,19 @@ try {
 ```
 
 ##### Browse services example
+
 ```java
 try {
 	browseService = dnssd.browse("_rxdnssd._tcp", new BrowseListener() {
-                
+
  		@Override
-		public void serviceFound(DNSSDService browser, int flags, int ifIndex, 
+		public void serviceFound(DNSSDService browser, int flags, int ifIndex,
 			final String serviceName, String regType, String domain) {
 			Log.i("TAG", "Found " + serviceName);
 		}
 
 		@Override
-		public void serviceLost(DNSSDService browser, int flags, int ifIndex, 
+		public void serviceLost(DNSSDService browser, int flags, int ifIndex,
 			String serviceName, String regType, String domain) {
 			Log.i("TAG", "Lost " + serviceName);
 		}
@@ -141,7 +138,7 @@ try {
 		@Override
 		public void operationFailed(DNSSDService service, int errorCode) {
 			Log.e("TAG", "error: " + errorCode);
-		}        
+		}
 	});
 } catch (DNSSDException e) {
 	Log.e("TAG", "error", e);
@@ -154,14 +151,15 @@ You can find more samples in app inside this repository.
 
 - RxDnssdBindable
 ```
-RxDnssd rxdnssd = new RxDnssdBindable(context); 
+RxDnssd rxdnssd = new RxDnssdBindable(context);
 ```
 - RxDnssdEmbedded
 ```
-RxDnssd rxdnssd = new RxDnssdEmbedded(); 
+RxDnssd rxdnssd = new RxDnssdEmbedded();
 ```
 
 ##### Register service
+
 ```java
 BonjourService bs = new BonjourService.Builder(0, 0, Build.DEVICE, "_rxdnssd._tcp", null).port(123).build();
 Subscription subscription = rxdnssd.register(bonjourService)
@@ -174,6 +172,7 @@ Subscription subscription = rxdnssd.register(bonjourService)
 ```
 
 ##### Browse services example
+
 ```java
 Subscription subscription = rxDnssd.browse("_http._tcp", "local.")
 	.compose(rxDnssd.resolve())
@@ -196,15 +195,17 @@ Subscription subscription = rxDnssd.browse("_http._tcp", "local.")
 ### Rx2DNSSD
 
 - Rx2DnssdBindable
+```java
+Rx2Dnssd rxdnssd = new Rx2DnssdBindable(context);
 ```
-Rx2Dnssd rxdnssd = new Rx2DnssdBindable(context); 
-```
+
 - Rx2DnssdEmbedded
-```
-Rx2Dnssd rxdnssd = new Rx2DnssdEmbedded(); 
+```java
+Rx2Dnssd rxdnssd = new Rx2DnssdEmbedded();
 ```
 
 ##### Register service
+
 ```java
 BonjourService bs = new BonjourService.Builder(0, 0, Build.DEVICE, "_rxdnssd._tcp", null).port(123).build();
 registerDisposable = rxDnssd.register(bs)
@@ -218,6 +219,7 @@ registerDisposable = rxDnssd.register(bs)
 ```
 
 ##### Browse services example
+
 ```java
 browseDisposable = rxDnssd.browse("_http._tcp", "local.")
         .compose(rxDnssd.resolve())

@@ -34,7 +34,7 @@ android {
         }
     }
 
-    ndkVersion "23.1.7779620"
+    ndkVersion "24.0.8215888"
 }
 
 dependencies {
@@ -53,8 +53,10 @@ dependencies {
 
 ext {
     // Provide your own coordinates here
-    PUBLISH_GROUP_ID = 'com.github.andriydruk'
+    PUBLISH_GROUP_ID = 'live.ditto'
     PUBLISH_ARTIFACT_ID = 'dnssd'
 }
 
-apply from: "${rootProject.projectDir}/publish-module.gradle"
+if (rootProject.name == 'RxDNSSD') {
+    apply from: "${rootProject.projectDir}/publish-module.gradle"
+}
