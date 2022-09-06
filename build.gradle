@@ -39,3 +39,10 @@ task clean(type: Delete) {
 
 apply plugin: 'io.github.gradle-nexus.publish-plugin'
 apply from: "${rootDir}/publish-root.gradle"
+
+
+wrapper {
+    // Change this version and run `./gradlew wrapper` in order to update the gradle wrapper.
+    gradleVersion = gradleWrapperVersion
+    distributionType = Wrapper.DistributionType.BIN
+}
