@@ -49,3 +49,5 @@ dnssd/.cxx
 
 # macOS
 .DS_Store
+
+.vscode/
