@@ -26,7 +26,8 @@ ext.preDexLibs = !project.hasProperty('disablePreDex')
 
 subprojects {
     project.plugins.whenPluginAdded { plugin ->
-        if ('com.android.build.gradle.AppPlugin'.equals(plugin.class.name) || 'com.android.build.gradle.LibraryPlugin'.equals(plugin.class.name)) {
+        if ('com.android.build.gradle.AppPlugin' == plugin.class.name ||
+            'com.android.build.gradle.LibraryPlugin' == plugin.class.name) {
             // enable or disable pre-dexing
             project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
         }
@@ -39,7 +40,6 @@ task clean(type: Delete) {
 
 apply plugin: 'io.github.gradle-nexus.publish-plugin'
 apply from: "${rootDir}/publish-root.gradle"
-
 
 wrapper {
     // Change this version and run `./gradlew wrapper` in order to update the gradle wrapper.
