@@ -5,6 +5,7 @@ repositories {
 }
 
 android {
+    namespace 'com.github.druk.dnssd'
     compileSdkVersion 30
 
     defaultConfig {
