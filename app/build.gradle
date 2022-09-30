@@ -17,9 +17,6 @@ android {
         }
     }
 
-    lintOptions {
-        abortOnError false
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -27,6 +24,9 @@ android {
     }
 
     ndkVersion "24.0.8215888"
+    lint {
+        abortOnError false
+    }
 }
 
 dependencies {
