@@ -13,7 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.druk.rx2dnssd;
+package com.github.druk.rx3dnssd;
+
+import static junit.framework.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import com.github.druk.dnssd.BrowseListener;
 import com.github.druk.dnssd.DNSSD;
@@ -37,25 +48,14 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import io.reactivex.Flowable;
-import io.reactivex.android.plugins.RxAndroidPlugins;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subscribers.TestSubscriber;
-
-import static junit.framework.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.subscribers.TestSubscriber;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("com.github.druk.dnssd.DNSSD")
-public class Rx2DnssdTest {
+public class Rx3DnssdTest {
 
     static final int FLAGS = 0;
     static final int IF_INDEX = 0;
@@ -94,7 +94,7 @@ public class Rx2DnssdTest {
             .inet6Address(inet6Address).build();
 
     DNSSDService mockService;
-    Rx2DnssdCommon rxDnssd;
+    Rx3DnssdCommon rxDnssd;
     DNSSD mockDNSSD;
 
     @Before
@@ -102,15 +102,15 @@ public class Rx2DnssdTest {
         RxAndroidPlugins.setMainThreadSchedulerHandler(scheduler -> Schedulers.trampoline());
         mockService = mock(DNSSDService.class);
         mockDNSSD = mock(DNSSD.class);
-        rxDnssd = new Rx2DnssdCommon(mockDNSSD) {
+        rxDnssd = new Rx3DnssdCommon(mockDNSSD) {
         };
     }
 
     @Test
     public void test_browse_unsubscribe() throws DNSSDException {
         when(mockDNSSD.browse(anyInt(), anyInt(), anyString(), anyString(), any(BrowseListener.class))).thenReturn(mockService);
-        TestSubscriber s = rxDnssd.browse(REG_TYPE_STRING, DOMAIN_STRING).test();
-        s.dispose();
+        TestSubscriber<BonjourService> s = rxDnssd.browse(REG_TYPE_STRING, DOMAIN_STRING).test();
+        s.cancel();
         verify(mockService).stop();
     }
 
@@ -129,7 +129,7 @@ public class Rx2DnssdTest {
     public void test_browse_found_after_unsubscribe() throws Exception {
         when(mockDNSSD.browse(anyInt(), anyInt(), anyString(), anyString(), any(BrowseListener.class))).thenReturn(mockService);
         TestSubscriber<BonjourService> testSubscriber = rxDnssd.browse(REG_TYPE_STRING, DOMAIN_STRING).test();
-        testSubscriber.dispose();
+        testSubscriber.cancel();
 
         ArgumentCaptor<BrowseListener> propertiesCaptor = ArgumentCaptor.forClass(BrowseListener.class);
         verify(mockDNSSD).browse(anyInt(), anyInt(), anyString(), anyString(), propertiesCaptor.capture());
@@ -153,7 +153,7 @@ public class Rx2DnssdTest {
     public void test_browse_lost_after_unsubscribe() throws Exception {
         when(mockDNSSD.browse(anyInt(), anyInt(), anyString(), anyString(), any(BrowseListener.class))).thenReturn(mockService);
         TestSubscriber<BonjourService> testSubscriber = rxDnssd.browse(REG_TYPE_STRING, DOMAIN_STRING).test();
-        testSubscriber.dispose();
+        testSubscriber.cancel();
 
         ArgumentCaptor<BrowseListener> propertiesCaptor = ArgumentCaptor.forClass(BrowseListener.class);
         verify(mockDNSSD).browse(anyInt(), anyInt(), anyString(), anyString(), propertiesCaptor.capture());
@@ -179,7 +179,7 @@ public class Rx2DnssdTest {
         mockStatic(DNSSD.class);
         when(mockDNSSD.browse(anyInt(), anyInt(), anyString(), anyString(), any(BrowseListener.class))).thenReturn(mockService);
         TestSubscriber<BonjourService> testSubscriber = rxDnssd.browse(REG_TYPE_STRING, DOMAIN_STRING).test();
-        testSubscriber.dispose();
+        testSubscriber.cancel();
 
         ArgumentCaptor<BrowseListener> propertiesCaptor = ArgumentCaptor.forClass(BrowseListener.class);
         verify(mockDNSSD).browse(anyInt(), anyInt(), anyString(), anyString(), propertiesCaptor.capture());
@@ -190,7 +190,7 @@ public class Rx2DnssdTest {
     @Test
     public void test_resolve_unsubscribe() throws DNSSDException {
         when(mockDNSSD.resolve(anyInt(), anyInt(), anyString(), anyString(), anyString(), any(ResolveListener.class))).thenReturn(mockService);
-        Flowable.just(bonjourService).compose(rxDnssd.resolve()).test().dispose();
+        Flowable.just(bonjourService).compose(rxDnssd.resolve()).test().cancel();
         verify(mockService).stop();
     }
 
@@ -218,13 +218,13 @@ public class Rx2DnssdTest {
     public void test_resolve_successfully_after_unsubscribe() throws DNSSDException {
         when(mockDNSSD.resolve(anyInt(), anyInt(), anyString(), anyString(), anyString(), any(ResolveListener.class))).thenReturn(mockService);
         TestSubscriber<BonjourService> testSubscriber = new TestSubscriber<>();
-        Flowable.just(bonjourService).compose(rxDnssd.resolve()).test().dispose();
+        Flowable.just(bonjourService).compose(rxDnssd.resolve()).test().cancel();
 
         ArgumentCaptor<ResolveListener> propertiesCaptor = ArgumentCaptor.forClass(ResolveListener.class);
         verify(mockDNSSD).resolve(anyInt(), anyInt(), anyString(), anyString(), anyString(), propertiesCaptor.capture());
         propertiesCaptor.getValue().serviceResolved(mockService, FLAGS, IF_INDEX, SERVICE_NAME, HOSTNAME, PORT, new HashMap<>());
         testSubscriber.assertNoValues();
-        testSubscriber.assertNotTerminated();
+        testSubscriber.assertNotComplete();
     }
 
     @Test
@@ -243,7 +243,7 @@ public class Rx2DnssdTest {
     public void test_resolve_failure_after_unsubscribe() throws DNSSDException {
         when(mockDNSSD.resolve(anyInt(), anyInt(), anyString(), anyString(), anyString(), any(ResolveListener.class))).thenReturn(mockService);
         TestSubscriber<BonjourService> testSubscriber = new TestSubscriber<>();
-        Flowable.just(bonjourService).compose(rxDnssd.resolve()).test().dispose();
+        Flowable.just(bonjourService).compose(rxDnssd.resolve()).test().cancel();
 
         ArgumentCaptor<ResolveListener> propertiesCaptor = ArgumentCaptor.forClass(ResolveListener.class);
         verify(mockDNSSD).resolve(anyInt(), anyInt(), anyString(), anyString(), anyString(), propertiesCaptor.capture());
@@ -254,14 +254,14 @@ public class Rx2DnssdTest {
     @Test
     public void test_query_ipv4_records_unsubscribe() throws DNSSDException {
         when(mockDNSSD.queryRecord(anyInt(), anyInt(), anyString(), eq(1), eq(1), eq(true), any(QueryListener.class))).thenReturn(mockService);
-        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV4Records()).test().dispose();
+        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV4Records()).test().cancel();
         verify(mockService).stop();
     }
 
     @Test
     public void test_query_ipv6_records_unsubscribe() throws DNSSDException {
         when(mockDNSSD.queryRecord(anyInt(), anyInt(), anyString(), eq(28), eq(1), eq(true), any(QueryListener.class))).thenReturn(mockService);
-        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV6Records()).test().dispose();
+        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV6Records()).test().cancel();
         verify(mockService).stop();
     }
 
@@ -269,7 +269,7 @@ public class Rx2DnssdTest {
     public void test_query_records_unsubscribe() throws DNSSDException {
         when(mockDNSSD.queryRecord(anyInt(), anyInt(), anyString(), eq(1), eq(1), eq(true), any(QueryListener.class))).thenReturn(mockService);
         when(mockDNSSD.queryRecord(anyInt(), anyInt(), anyString(), eq(28), eq(1), eq(true), any(QueryListener.class))).thenReturn(mockService);
-        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryRecords()).test().dispose();
+        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryRecords()).test().cancel();
         verify(mockService, times(2)).stop();
     }
 
@@ -461,7 +461,7 @@ public class Rx2DnssdTest {
         when(mockDNSSD.queryRecord(anyInt(), anyInt(), anyString(), eq(1), eq(1), any(QueryListener.class))).thenReturn(mockService);
 
         TestSubscriber<BonjourService> testSubscriber = new TestSubscriber<>();
-        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV4Records()).test().dispose();
+        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV4Records()).test().cancel();
 
         ArgumentCaptor<QueryListener> propertiesCaptor = ArgumentCaptor.forClass(QueryListener.class);
         verify(mockDNSSD).queryRecord(anyInt(), anyInt(), anyString(), eq(1), eq(1), eq(true), propertiesCaptor.capture());
@@ -469,7 +469,7 @@ public class Rx2DnssdTest {
 
         queryListener.queryAnswered(mockService, FLAGS, IF_INDEX, HOSTNAME, 0, 0, inet4Address.getAddress(), 0);
         testSubscriber.assertNoValues();
-        testSubscriber.assertNotTerminated();
+        testSubscriber.assertNotComplete();
     }
 
     @Test
@@ -477,7 +477,7 @@ public class Rx2DnssdTest {
         when(mockDNSSD.queryRecord(anyInt(), anyInt(), anyString(), eq(28), eq(1), any(QueryListener.class))).thenReturn(mockService);
 
         TestSubscriber<BonjourService> testSubscriber = new TestSubscriber<>();
-        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV6Records()).test().dispose();
+        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV6Records()).test().cancel();
 
         ArgumentCaptor<QueryListener> propertiesCaptor = ArgumentCaptor.forClass(QueryListener.class);
         verify(mockDNSSD).queryRecord(anyInt(), anyInt(), anyString(), eq(28), eq(1), eq(true), propertiesCaptor.capture());
@@ -485,7 +485,7 @@ public class Rx2DnssdTest {
 
         queryListener.queryAnswered(mockService, FLAGS, IF_INDEX, HOSTNAME, 0, 0, inet6Address.getAddress(), 0);
         testSubscriber.assertNoValues();
-        testSubscriber.assertNotTerminated();
+        testSubscriber.assertNotComplete();
     }
 
     @Test
@@ -495,7 +495,7 @@ public class Rx2DnssdTest {
         ArgumentCaptor<QueryListener> propertiesCaptor = ArgumentCaptor.forClass(QueryListener.class);
 
         TestSubscriber<BonjourService> testSubscriber = new TestSubscriber<>();
-        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryRecords()).test().dispose();
+        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryRecords()).test().cancel();
 
         verify(mockDNSSD).queryRecord(anyInt(), anyInt(), anyString(), eq(1), eq(1), eq(true), propertiesCaptor.capture());
         propertiesCaptor.getValue().queryAnswered(mockService, FLAGS, IF_INDEX, HOSTNAME, NSType.A, 0, inet4Address.getAddress(), 0);
@@ -504,7 +504,7 @@ public class Rx2DnssdTest {
         propertiesCaptor.getValue().queryAnswered(mockService, FLAGS, IF_INDEX, HOSTNAME, NSType.AAAA, 0, inet6Address.getAddress(), 0);
 
         testSubscriber.assertNoValues();
-        testSubscriber.assertNotTerminated();
+        testSubscriber.assertNotComplete();
     }
 
     @Test
@@ -560,7 +560,7 @@ public class Rx2DnssdTest {
         when(mockDNSSD.queryRecord(anyInt(), anyInt(), anyString(), eq(1), eq(1), any(QueryListener.class))).thenReturn(mockService);
 
         TestSubscriber<BonjourService> testSubscriber = new TestSubscriber<>();
-        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV4Records()).test().dispose();
+        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV4Records()).test().cancel();
 
         ArgumentCaptor<QueryListener> propertiesCaptor = ArgumentCaptor.forClass(QueryListener.class);
         verify(mockDNSSD).queryRecord(anyInt(), anyInt(), anyString(), eq(1), eq(1), eq(true), propertiesCaptor.capture());
@@ -575,7 +575,7 @@ public class Rx2DnssdTest {
         when(mockDNSSD.queryRecord(anyInt(), anyInt(), anyString(), eq(28), eq(1), any(QueryListener.class))).thenReturn(mockService);
 
         TestSubscriber<BonjourService> testSubscriber = new TestSubscriber<>();
-        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV6Records()).test().dispose();
+        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryIPV6Records()).test().cancel();
 
         ArgumentCaptor<QueryListener> propertiesCaptor = ArgumentCaptor.forClass(QueryListener.class);
         verify(mockDNSSD).queryRecord(anyInt(), anyInt(), anyString(), eq(28), eq(1), eq(true), propertiesCaptor.capture());
@@ -592,7 +592,7 @@ public class Rx2DnssdTest {
         ArgumentCaptor<QueryListener> propertiesCaptor = ArgumentCaptor.forClass(QueryListener.class);
 
         TestSubscriber<BonjourService> testSubscriber = new TestSubscriber<>();
-        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryRecords()).test().dispose();
+        Flowable.just(resolvedBonjourService).compose(rxDnssd.queryRecords()).test().cancel();
 
         verify(mockDNSSD).queryRecord(anyInt(), anyInt(), anyString(), eq(1), eq(1), eq(true), propertiesCaptor.capture());
         propertiesCaptor.getValue().operationFailed(mockService, 0);
